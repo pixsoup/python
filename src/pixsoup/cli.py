@@ -6,8 +6,8 @@ from gql.transport.exceptions import TransportQueryError
 from urllib.parse import urlparse
 from clint.textui import progress
 from dotmap import DotMap
-from api.api import PixSoupAPI, APIError
-from api.data import FileMetaInput
+from .api.api import PixSoupAPI, APIError
+from .api.data import FileMetaInput
 import usersettings
 import dateutil.parser
 import requests
@@ -263,7 +263,8 @@ def delete_job(ctx):
 
 # endregion =====================================================
 
-if __name__ == '__main__':
+def main():
+  global settings, api
   settings = usersettings.Settings(PACKAGE)
   settings.add_setting("api_key", default=None)
   settings.add_setting("api_token", default=None)
@@ -271,12 +272,10 @@ if __name__ == '__main__':
   if len(argv) > 1 and argv[1] == 'signin':
     cli()
     exit()
-
   if not settings.api_key or not settings.api_token:
     print("You are not signed in, sign-in first using the 'signin' command")
     print(f"$ {argv[0]} signin")
     exit(1)
-
   try:
     api = PixSoupAPI(settings.api_key, settings.api_token)
     cli()
@@ -289,3 +288,6 @@ if __name__ == '__main__':
   except Exception as e:
     print('error:', e)
     exit(1)
+
+if __name__ == '__main__':
+  main()
