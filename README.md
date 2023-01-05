@@ -6,16 +6,16 @@ StableDiffusion using Dreambooth.
 
 For integration with your own tooling check GraphQL [schema](schema.graphql).
 
-## Usage
-
-```bash
-$ pixsoup --help
-```
-
 ## Install
 
 ```bash
 $ pip install pixsoup
+```
+
+## Usage
+
+```bash
+$ pixsoup --help
 ```
 
 ## Build
@@ -23,3 +23,14 @@ $ pip install pixsoup
 ```bash
 $ python -m build
 ```
+
+#### Publish to PyPI
+
+```bash
+# test
+$ twine upload --verbose -r testpypi dist/*
+
+# live
+$ twine upload --verbose dist/*
+```
+
