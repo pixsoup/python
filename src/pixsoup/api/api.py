@@ -74,7 +74,7 @@ class PixSoupAPI:
   def delete_job(self, id: ID) -> bool:
     return self._exec(m_delete_job, { 'input': { 'id': id } }).deleteJob.success
 
-  def _exec(self, query: Any, variables: Optional[Dict[str, Any] | None] = None) -> DotMap:
+  def _exec(self, query: DocumentNode, variables: Optional[Dict[str, Any] | None] = None) -> DotMap:
     try:
       return DotMap(self.client.execute(query, variable_values=variables))
     except TransportQueryError as e:
