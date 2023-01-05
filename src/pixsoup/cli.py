@@ -64,7 +64,7 @@ def resource(ctx, id):
 
 @dataset.group()
 def run():
-  """Create training jobs."""
+  """Run job on the selected dataset."""
 
 @cli.group()
 def jobs():
@@ -81,7 +81,7 @@ def job(ctx, id):
 
 @cli.command("signin")
 def signin():
-  """Sign-in using API key."""
+  """Sign-in using an API key."""
   print(f"Visit {WEB_MEMBERS_URI} and generate API (key / token) pair.")
   print()
   settings.api_key = click.prompt('Please enter the API key', type=str)
@@ -273,12 +273,11 @@ if __name__ == '__main__':
     exit()
 
   if not settings.api_key or not settings.api_token:
-    print("You are not signed in, sign-in first using 'signin' command")
+    print("You are not signed in, sign-in first using the 'signin' command")
     print(f"$ {argv[0]} signin")
     exit(1)
 
   try:
-    PixSoupAPI.endpoint = 'http://localhost:8090/graphql' # TODO: delete
     api = PixSoupAPI(settings.api_key, settings.api_token)
     cli()
   except APIError as e:
