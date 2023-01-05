@@ -1,0 +1,235 @@
+
+type ApiKey implements Node {
+  createdAt: Time!
+  id: ID!
+  key: String!
+  name: String!
+  secret: String
+}
+
+type Charge implements Node {
+  createdAt: Time!
+  id: ID!
+  jobName: String!
+  tokens: Int!
+}
+
+type ChargeConnection {
+  edges: [ChargeEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ChargeEdge {
+  cursor: ID!
+  node: Charge!
+}
+
+input CreateApiKeyInput {
+  name: String!
+}
+
+type CreateApiKeyPayload {
+  key: ApiKey!
+}
+
+input CreateDatasetInput {
+  name: String!
+}
+
+type CreateDatasetPayload {
+  dataset: DatasetDetail!
+}
+
+input CreateResourceInput {
+  dataset: ID!
+  file: FileMetaInput!
+}
+
+type CreateResourcePayload {
+  uploadUri: String!
+}
+
+interface Dataset {
+  createdAt: Time!
+  id: ID!
+  name: String!
+  sealedAt: Time
+}
+
+type DatasetConnection {
+  edges: [DatasetEdge!]!
+  pageInfo: PageInfo!
+}
+
+type DatasetDetail implements Dataset & Node {
+  createdAt: Time!
+  id: ID!
+  name: String!
+  resource(id: ID!): Resource
+  resources: [Resource!]!
+  sealedAt: Time
+}
+
+type DatasetEdge {
+  cursor: ID!
+  node: DatasetInfo!
+}
+
+type DatasetInfo implements Dataset & Node {
+  createdAt: Time!
+  id: ID!
+  name: String!
+  sealedAt: Time
+}
+
+input DeleteDatasetInput {
+  id: ID!
+}
+
+type DeleteDatasetPayload {
+  success: Boolean!
+}
+
+input DeleteJobInput {
+  id: ID!
+}
+
+type DeleteJobPayload {
+  success: Boolean!
+}
+
+input DeleteResourceInput {
+  id: ID!
+}
+
+type DeleteResourcePayload {
+  success: Boolean!
+}
+
+input DreamboothArgsInput {
+  className: String!
+  instanceName: String!
+  learningRate: Float! = 0.000005
+  lrScheduler: DreamboothScheduler! = Constant
+  maxTrainSteps: Int! = 800
+  numClassImages: Int! = 200
+  sdVersion: StableDiffusionVer! = V15
+  trainTextEncoder: Boolean! = false
+  withPriorPreservation: Boolean! = false
+}
+
+enum DreamboothScheduler {
+  Constant
+  ConstantWarmup
+  Cosine
+  CosineRestarts
+  Linear
+  Polynomial
+}
+
+scalar Email
+
+input FileMetaInput {
+  contentLength: Int!
+  contentType: String!
+  name: String!
+}
+
+type Job implements Node {
+  args: String
+  createdAt: Time!
+  downloadLink: String
+  finishedAt: Time
+  id: ID!
+  name: String!
+  startedAt: Time
+  state: JobState!
+}
+
+type JobConnection {
+  edges: [JobEdge!]!
+  pageInfo: PageInfo!
+}
+
+type JobEdge {
+  cursor: ID!
+  node: Job!
+}
+
+enum JobState {
+  Created
+  Done
+  Failed
+  Running
+}
+
+type Mutation {
+  createDataset(input: CreateDatasetInput!): CreateDatasetPayload
+  deleteDataset(input: DeleteDatasetInput!): DeleteDatasetPayload
+  sealDataset(input: SealDatasetInput!): SealDatasetPayload
+  createResource(input: CreateResourceInput!): CreateResourcePayload
+  deleteResource(input: DeleteResourceInput!): DeleteResourcePayload
+  runDreamboothJob(input: RunDreamboothJobInput!): RunDreamboothJobPayload
+  deleteJob(input: DeleteJobInput!): DeleteJobPayload
+}
+
+interface Node {
+  id: ID!
+}
+
+type PageInfo {
+  endCursor: ID
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: ID
+}
+
+scalar Password
+
+type Query {
+  viewer: User
+}
+
+type Resource implements Node {
+  id: ID!
+  name: String!
+}
+
+input RunDreamboothJobInput {
+  args: DreamboothArgsInput!
+  dataset: ID!
+  name: String!
+}
+
+type RunDreamboothJobPayload {
+  job: Job!
+  user: User!
+}
+
+input SealDatasetInput {
+  id: ID!
+}
+
+type SealDatasetPayload {
+  success: Boolean!
+}
+
+enum StableDiffusionVer {
+  V15
+}
+
+scalar Time
+
+type User implements Node {
+  apiKeys: [ApiKey!]!
+  charges(after: ID, before: ID, first: Int, last: Int): ChargeConnection
+  dataset(id: ID!): DatasetDetail
+  datasets(after: ID, before: ID, first: Int, last: Int): DatasetConnection
+  email: Email!
+  id: ID!
+  job(id: ID!): Job
+  jobCallbackUri: String
+  jobs(after: ID, before: ID, first: Int, last: Int): JobConnection
+  tokens: Int!
+  verifiedEmail: Boolean!
+}
