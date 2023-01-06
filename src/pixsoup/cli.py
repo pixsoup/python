@@ -2,11 +2,9 @@
 from os import listdir, makedirs
 from os.path import isfile, join, getsize, splitext
 from sys import argv
-from gql.transport.exceptions import TransportQueryError
 from urllib.parse import urlparse
 from clint.textui import progress
-from dotmap import DotMap
-from .api.api import PixSoupAPI, APIError
+from .api.api import PixSoupAPI, APIErrors
 from .api.data import FileMetaInput
 import usersettings
 import dateutil.parser
@@ -178,13 +176,15 @@ def add_resources(ctx, directory):
       if not res.ok:
         raise Exception(f"cannot upload {path}: {res.text}")
       print(f"[{res.status_code}] file {path} succesfully uploaded")
-    except TransportQueryError as e:
+    except APIErrors as err:
       fail = True
-      for err in e.errors:
-        if DotMap(err).extensions.code == "dataset/resourceFileAlready":
+      for e in err.errors:
+        if e.code == "dataset/resourceFileAlready":
           fail = False
-        print(f"error: {file}:", err["message"])
-      if fail: return
+        print(f"error: {file}:", e.message)
+        if e.meta:
+          print(f"    >> {e.meta}")
+      if len(err.errors) > 1 or fail: return
 
 @resource.command("delete")
 @click.pass_context
@@ -279,11 +279,14 @@ def main():
   try:
     api = PixSoupAPI(settings.api_key, settings.api_token)
     cli()
-  except APIError as e:
-    if e.code:
-      print(f'error: {e.code}: {e.message}')
-    else:
-      print('error:', e.message)
+  except APIErrors as err:
+    for e in err.errors:
+      if e.code:
+        print(f'error: {e.code}: {e.message}')
+      else:
+        print('error:', e.message)
+      if e.meta:
+        print(f"    >> {e.meta}")
     exit(1)
   except Exception as e:
     print('error:', e)

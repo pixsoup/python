@@ -14,14 +14,30 @@ class APIError(Exception):
   Attributes:
     code -- error code (if any)
     message -- error message
+    meta -- additional error information
+  """
+
+  def __init__(self, error: Any):
+    if error['extensions']:
+      ext = error['extensions']
+      self.code = ext['code']
+      self.meta = ext['meta']
+    self.message = error['message']
+    super().__init__(self.message)
+
+class APIErrors(Exception):
+  """PixSoup API error container.
+
+  Attributes:
+    errors -- API errors
+    message -- generic error message
   """
 
   def __init__(self, e: TransportQueryError):
-    error = e.errors[0]
-    if error['extensions']:
-      self.code = error['extensions']['code']
-    self.message = error['message']
-    super().__init__(self.message)
+    self.errors = []
+    for err in e.errors:
+      self.errors.append(APIError(err))
+    super().__init__('API returned one or multiple errors')
 
 class PixSoupAPI:
   endpoint = 'https://api.pixsoup.com/graphql'
@@ -53,7 +69,7 @@ class PixSoupAPI:
   def seal_dataset(self, id: ID) -> bool:
     return self._exec(m_seal_dataset, { 'input': { 'id': id } }).sealDataset.success
 
-  def create_resource(self, dataset_id: ID, file: FileMetaInput) -> UploadURI:
+  def create_resource(self, dataset_id: ID, file: FileMeta) -> UploadURI:
     input = { 'dataset': dataset_id, 'file': file.toMap() }
     return self._exec(m_create_resource, { 'input': input }).createResource.uploadUri
 
@@ -78,4 +94,4 @@ class PixSoupAPI:
     try:
       return DotMap(self.client.execute(query, variable_values=variables))
     except TransportQueryError as e:
-      raise APIError(e)
+      raise APIErrors(e)

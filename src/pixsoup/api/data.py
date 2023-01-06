@@ -4,7 +4,7 @@ ID = NewType("ID", str)
 ISODate = NewType("ISODate", str)
 UploadURI = NewType("UploadURI", str)
 
-class _FileMetaInput:
+class FileMetaInput:
   def __init__(self, name: str, ct: str, sz: int):
     self.name = name
     self.contentType = ct
@@ -45,7 +45,7 @@ class _Job(_CreatedJob):
   finishedAt: ISODate | None
   downloadLink: str | None
 
-FileMetaInput = NewType("FileMetaInput", _FileMetaInput)
+FileMeta = NewType("FileMeta", FileMetaInput)
 Account = NewType("Account", _Account)
 Resource = NewType("Resource", _Resource)
 Dataset = NewType("Dataset", _Dataset)
