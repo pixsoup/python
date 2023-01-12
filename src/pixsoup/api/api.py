@@ -20,8 +20,8 @@ class APIError(Exception):
   def __init__(self, error: Any):
     if error['extensions']:
       ext = error['extensions']
-      self.code = ext['code']
-      self.meta = ext['meta']
+      self.code = ext.get('code')
+      self.meta = ext.get('meta')
     self.message = error['message']
     super().__init__(self.message)
 

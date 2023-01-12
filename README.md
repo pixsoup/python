@@ -21,12 +21,15 @@ $ pixsoup --help
 ## Build
 
 ```bash
+$ pip install build
 $ python -m build
 ```
 
 #### Publish to PyPI
 
 ```bash
+$ pip install twine
+
 # test
 $ twine upload --verbose -r testpypi dist/*
 
