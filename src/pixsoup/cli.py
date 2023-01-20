@@ -204,7 +204,7 @@ def delete_resource(ctx):
 @click.option("--maxTrainSteps", "maxTrainSteps", default=800, type=click.IntRange(200, 2000, clamp=True), show_default=True)
 @click.option("--numClassImages", "numClassImages", default=200, type=click.IntRange(100, 400, clamp=True), show_default=True)
 @click.option("--lrScheduler", "lrScheduler", default="Constant", type=click.Choice(['Linear', 'Cosine', 'CosineRestarts', 'Polynomial', 'Constant', 'ConstantWarmup']), show_default=True)
-@click.option("--sdVersion", "sdVersion", default="V15", type=click.Choice(['V15']), show_default=True)
+@click.option("--sdVersion", "sdVersion", default="V21", type=click.Choice(['V15', 'V21']), show_default=True)
 @click.pass_context
 def run_dreambooth_job(ctx, name, **args):
   """Run Dreambooth job using provided parameters."""
